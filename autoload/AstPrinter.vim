@@ -15,7 +15,7 @@ type Grouping = Ex.Grouping
 type Literal = Ex.Literal
 type Unary = Ex.Unary
 
-class AstPrinter implements Visitor, VisitorNext
+export class AstPrinter implements Visitor, VisitorNext
     def Print(expr: Expr): string
         return expr.Accept(this)
     enddef
@@ -67,16 +67,16 @@ endclass
 
 # Testing. Delete later.
 # (* (- 123) (group 45.67))
-var expression = Binary.new(
-    Unary.new(
-        Token.new(TokenType.MINUS, "-", null, 1),
-        Literal.new(123)
-    ),
-    Token.new(TokenType.STAR, "*", null, 1),
-    Grouping.new(Literal.new(45.67))
-)
+# var expression = Binary.new(
+    # Unary.new(
+        # Token.new(TokenType.MINUS, "-", null, 1),
+        # Literal.new(123)
+    # ),
+    # Token.new(TokenType.STAR, "*", null, 1),
+    # Grouping.new(Literal.new(45.67))
+# )
 
-echo AstPrinter.new().Print(expression)
+# echo AstPrinter.new().Print(expression)
 
 if !exists("g:vimlox_production")
     defc
