@@ -212,6 +212,6 @@ export class Scanner
     enddef
 endclass
 
-if exists('g:vimlox_development')
+if !exists("g:vimlox_production")
     defc
 endif

@@ -72,6 +72,6 @@ export interface VisitorNext
     def VisitUnaryExpr(expr: Unary): string
 endinterface
 
-if exists('g:vimlox_development')
+if !exists("g:vimlox_production")
     defc
 endif

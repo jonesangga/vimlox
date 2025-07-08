@@ -78,6 +78,6 @@ var expression = Binary.new(
 
 echo AstPrinter.new().Print(expression)
 
-if exists('g:vimlox_development')
+if !exists("g:vimlox_production")
     defc
 endif

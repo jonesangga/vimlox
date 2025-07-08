@@ -16,6 +16,6 @@ export def Run(source: string): void
     endfor
 enddef
 
-if exists('g:vimlox_development')
+if !exists("g:vimlox_production")
     defc
 endif

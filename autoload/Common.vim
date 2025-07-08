@@ -11,6 +11,6 @@ def Report(line: number, where: string, message: string): void
     hadError = true
 enddef
 
-if exists('g:vimlox_development')
+if !exists("g:vimlox_production")
     defc
 endif
