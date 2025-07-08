@@ -19,5 +19,5 @@ git clone --depth 1 https://github.com/jonesangga/vimlox ~/.vim/pack/vimlox/star
 For now use `:Vimlox <source code>`. For example
 
 ```
-:Vimlox var a = 2
+:Vimlox 1 + 2 * 3 + (4 - 5)
 ```
