@@ -40,7 +40,7 @@ def DefineAst(baseName: string, types: list<string>): void
     DefineVisitorNext(text, baseName, types)
     text->add("")
 
-    text->add("if exists('g:vimlox_development')")
+    text->add('if !exists("g:vimlox_production")')
     text->add("    defc")
     text->add("endif")
 
