@@ -7,63 +7,47 @@ import "./Expr.vim" as Ex
 type Token = Tok.Token
 type TokenType = TT.TokenType
 
-type Visitor = Ex.Visitor
-type VisitorNext = Ex.VisitorNext
 type Expr = Ex.Expr
 type Binary = Ex.Binary
 type Grouping = Ex.Grouping
 type Literal = Ex.Literal
 type Unary = Ex.Unary
 
-export class AstPrinter implements Visitor, VisitorNext
-    def Print(expr: Expr): string
-        return expr.Accept(this)
-    enddef
+export def AstPrinter(expr: Expr): string
+    if instanceof(expr, Binary)
+        var ex = <Binary>expr
+        return Parenthesize(ex.operator.lexeme, ex.left, ex.right)
 
-    def Visit(expr: any): string
-        var type = typename(expr)
-        if type == 'object<Binary>'
-            return this.VisitBinaryExpr(expr)
-        elseif type == 'object<Grouping>'
-            return this.VisitGroupingExpr(expr)
-        elseif type == 'object<Literal>'
-            return this.VisitLiteralExpr(expr)
-        elseif type == 'object<Unary>'
-            return this.VisitUnaryExpr(expr)
-        else
-            return "not implemented"
-        endif
-    enddef
+    elseif instanceof(expr, Grouping)
+        var ex = <Grouping>expr
+        return Parenthesize("group", ex.expression)
 
-    def VisitBinaryExpr(expr: Binary): string
-        return this._Parenthesize(expr.operator.lexeme, expr.left, expr.right)
-    enddef
-
-    def VisitGroupingExpr(expr: Grouping): string
-        return this._Parenthesize("group", expr.expression)
-    enddef
-
-    def VisitLiteralExpr(expr: Literal): string
-        if expr.value == null
+    elseif instanceof(expr, Literal)
+        var ex = <Literal>expr
+        if ex.value == null
             return "nil"
         endif
-        return string(expr.value)
-    enddef
+        return string(ex.value)
 
-    def VisitUnaryExpr(expr: Unary): string
-        return this._Parenthesize(expr.operator.lexeme, expr.right)
-    enddef
+    elseif instanceof(expr, Unary)
+        var ex = <Unary>expr
+        return Parenthesize(ex.operator.lexeme, ex.right)
 
-    def _Parenthesize(name: string, ...exprs: list<Expr>): string
-        var text = $"({name}"
-        for expr in exprs
-            text ..= " "
-            text ..= expr.Accept(this)
-        endfor
-        text ..= ")"
-        return text
-    enddef
-endclass
+    else
+        return "not implemented"
+    endif
+
+enddef
+
+def Parenthesize(name: string, ...exprs: list<Expr>): string
+    var text = $"({name}"
+    for expr in exprs
+        text ..= " "
+        text ..= AstPrinter(expr)
+    endfor
+    text ..= ")"
+    return text
+enddef
 
 # Testing. Delete later.
 # (* (- 123) (group 45.67))
@@ -76,7 +60,7 @@ endclass
     # Grouping.new(Literal.new(45.67))
 # )
 
-# echo AstPrinter.new().Print(expression)
+# echo AstPrinter(expression)
 
 if !exists("g:vimlox_production")
     defc

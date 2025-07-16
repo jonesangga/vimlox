@@ -7,7 +7,7 @@ import "./AstPrinter.vim" as Printer
 
 type Scanner = Scan.Scanner
 type Parser = Par.Parser
-type AstPrinter = Printer.AstPrinter
+var AstPrinter = Printer.AstPrinter
 
 export def Run(source: string): void
     Common.hadError = false
@@ -22,7 +22,7 @@ export def Run(source: string): void
         return
     endif
 
-    echo AstPrinter.new().Print(expression)
+    echo AstPrinter(expression)
 
     # For now, just print the tokens.
     # for token in tokens
