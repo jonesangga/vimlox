@@ -161,7 +161,7 @@ export class Scanner
             endwhile
         endif
 
-        this._AddToken(TokenType.NUMBER, str2nr(slice(this._source, this._start, this._current)))
+        this._AddToken(TokenType.NUMBER, str2float(slice(this._source, this._start, this._current)))
     enddef
 
     def _String(): void

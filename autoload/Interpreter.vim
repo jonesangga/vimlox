@@ -32,11 +32,11 @@ export class Interpreter
 
             if ex.operator.type == TokenType.MINUS
                 this._CheckNumberOperands(ex.operator, left, right)
-                return <number>left - <number>right
+                return <float>left - <float>right
 
             elseif ex.operator.type == TokenType.PLUS
-                if type(left) == v:t_number && type(right) == v:t_number
-                    return <number>left + <number>right
+                if type(left) == v:t_float && type(right) == v:t_float
+                    return <float>left + <float>right
                 elseif type(left) == v:t_string && type(right) == v:t_string
                     return <string>left .. <string>right
                 endif
@@ -44,27 +44,27 @@ export class Interpreter
 
             elseif ex.operator.type == TokenType.SLASH
                 this._CheckNumberOperands(ex.operator, left, right)
-                return <number>left / <number>right
+                return <float>left / <float>right
 
             elseif ex.operator.type == TokenType.STAR
                 this._CheckNumberOperands(ex.operator, left, right)
-                return <number>left * <number>right
+                return <float>left * <float>right
 
             elseif ex.operator.type == TokenType.GREATER
                 this._CheckNumberOperands(ex.operator, left, right)
-                return <number>left > <number>right
+                return <float>left > <float>right
 
             elseif ex.operator.type == TokenType.GREATER_EQUAL
                 this._CheckNumberOperands(ex.operator, left, right)
-                return <number>left >= <number>right
+                return <float>left >= <float>right
 
             elseif ex.operator.type == TokenType.LESS
                 this._CheckNumberOperands(ex.operator, left, right)
-                return <number>left < <number>right
+                return <float>left < <float>right
 
             elseif ex.operator.type == TokenType.LESS_EQUAL
                 this._CheckNumberOperands(ex.operator, left, right)
-                return <number>left <= <number>right
+                return <float>left <= <float>right
 
             elseif ex.operator.type == TokenType.BANG_EQUAL
                 return !this._IsEqual(left, right)
@@ -92,7 +92,7 @@ export class Interpreter
                 return this._IsTruthy(right)
             elseif ex.operator.type == TokenType.MINUS
                 this._CheckNumberOperand(ex.operator, right)
-                return -(<number>right)
+                return -(<float>right)
             endif
 
             # Unreachable.
@@ -123,14 +123,14 @@ export class Interpreter
     enddef
 
     def _CheckNumberOperand(operator: Token, operand: any): void
-        if type(operand) == v:t_number
+        if type(operand) == v:t_float
             return
         endif
         throw this._RuntimeError(operator, "Operand must be a number")
     enddef
 
     def _CheckNumberOperands(operator: Token, left: any, right: any): void
-        if type(left) == v:t_number && type(right) == v:t_number
+        if type(left) == v:t_float && type(right) == v:t_float
             return
         endif
         throw this._RuntimeError(operator, "Operand must be numbers")
@@ -144,8 +144,12 @@ export class Interpreter
         if object == null
             return "nil"
         endif
-        if type(object) == v:t_number
-            return string(object)
+        if type(object) == v:t_float
+            var text = string(object)
+            if (text[-2 : -1] == ".0")
+                text = text[0 : -3]
+            endif
+            return text
         endif
         return string(object)
     enddef
