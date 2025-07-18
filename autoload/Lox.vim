@@ -18,14 +18,14 @@ export def Run(source: string): void
     var tokens = scanner.ScanTokens()
 
     var parser = Parser.new(tokens)
-    var expression = parser.Parse()
+    var statements = parser.Parse()
 
     # Stop if there was a syntax error.
     if Common.hadError
         return
     endif
 
-    interpreter.Interpret(expression)
+    interpreter.Interpret(statements)
     # echo AstPrinter(expression)
 
     # For now, just print the tokens.

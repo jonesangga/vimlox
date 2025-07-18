@@ -4,6 +4,7 @@ import "./Common.vim"
 import "./Token.vim" as Tok
 import "./TokenType.vim" as TT
 import "./Expr.vim" as Ex
+import "./Stmt.vim" as St
 
 type Token = Tok.Token
 type TokenType = TT.TokenType
@@ -13,15 +14,42 @@ type Binary = Ex.Binary
 type Grouping = Ex.Grouping
 type Literal = Ex.Literal
 type Unary = Ex.Unary
+type Stmt = St.Stmt
+type Print = St.Print
+type Expression = St.Expression
 
 export class Interpreter
-    def Interpret(expr: Expr): void
+    # def Interpret(expr: Expr): void
+        # try
+            # var value = this._Evaluate(expr)
+            # echo this._Stringify(value)
+        # catch
+            # Common.RuntimeError(v:exception)
+        # endtry
+    # enddef
+
+    def Interpret(stmts: list<Stmt>): void
         try
-            var value = this._Evaluate(expr)
-            echo this._Stringify(value)
+            for stmt in stmts
+                this._Execute(stmt)
+            endfor
         catch
             Common.RuntimeError(v:exception)
         endtry
+    enddef
+
+    def _Execute(stmt: Stmt): void
+        if instanceof(stmt, Expression)
+            var st = <Expression>stmt
+            this._Evaluate(st.expression)
+            return
+
+        elseif instanceof(stmt, Print)
+            var st = <Print>stmt
+            var value = this._Evaluate(st.expression)
+            echo this._Stringify(value)
+            return
+        endif
     enddef
 
     def _Evaluate(expr: Expr): any

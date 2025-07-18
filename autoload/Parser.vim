@@ -4,6 +4,7 @@ import "./Common.vim"
 import "./Token.vim" as Tok
 import "./TokenType.vim" as TT
 import "./Expr.vim" as Ex
+import "./Stmt.vim" as St
 
 type Token = Tok.Token
 type TokenType = TT.TokenType
@@ -12,6 +13,9 @@ type Binary = Ex.Binary
 type Grouping = Ex.Grouping
 type Literal = Ex.Literal
 type Unary = Ex.Unary
+type Stmt = St.Stmt
+type Print = St.Print
+type Expression = St.Expression
 
 export class Parser
     final _tokens: list<Token>
@@ -21,13 +25,40 @@ export class Parser
         this._tokens = tokens
     enddef
 
-    def Parse(): any
-        try
-            return this._Expression()
-        catch
-            echo "caught " .. v:exception
-            return null
-        endtry
+    def Parse(): list<Stmt>
+        var statements: list<Stmt> = []
+        while !this._IsAtEnd()
+            statements->add(this._Stmt())
+        endwhile
+        return statements
+    enddef
+
+    # def Parse(): any
+        # try
+            # return this._Expression()
+        # catch
+            # echo "caught " .. v:exception
+            # return null
+        # endtry
+    # enddef
+
+    def _Stmt(): Stmt
+        if this._Match(TokenType.PRINT)
+            return this._PrintStmt()
+        endif
+        return this._ExprStmt()
+    enddef
+
+    def _PrintStmt(): Stmt
+        var value = this._Expression()
+        this._Consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Print.new(value)
+    enddef
+
+    def _ExprStmt(): Stmt
+        var expr = this._Expression()
+        this._Consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return Expression.new(expr)
     enddef
 
     # expression -> equality

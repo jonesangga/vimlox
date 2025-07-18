@@ -56,7 +56,18 @@ DefineAst("Expr", [
     "Unary    = operator: Token, right: Expr",
 ])
 
-# This is the original.
+DefineAst("Stmt", [
+    "Expression = expression: Expr",
+    "Print      = expression: Expr"
+])
+
+# These are the original.
+
+# defineAst(outputDir, "Stmt", Arrays.asList(
+    # "Expression : Expr expression",
+    # "Print      : Expr expression"
+# ))
+
 # DefineAst("", "Expr", [
     # "Binary   : Expr left, Token operator, Expr right",
     # "Grouping : Expr expression",
