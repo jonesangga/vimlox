@@ -54,18 +54,21 @@ DefineAst("Expr", [
     "Grouping = expression: Expr",
     "Literal  = value: any",
     "Unary    = operator: Token, right: Expr",
+    "Variable = name: Token",
 ])
 
 DefineAst("Stmt", [
     "Expression = expression: Expr",
-    "Print      = expression: Expr"
+    "Print      = expression: Expr",
+    "Var        = name: Token, initializer: Expr",
 ])
 
 # These are the original.
 
 # defineAst(outputDir, "Stmt", Arrays.asList(
     # "Expression : Expr expression",
-    # "Print      : Expr expression"
+    # "Print      : Expr expression",
+    # "Var        : Token name, Expr initializer"
 # ))
 
 # DefineAst("", "Expr", [
@@ -73,6 +76,7 @@ DefineAst("Stmt", [
     # "Grouping : Expr expression",
     # "Literal  : Object value",
     # "Unary    : Token operator, Expr right",
+    # "Variable : Token name"
 # ])
 
 defc

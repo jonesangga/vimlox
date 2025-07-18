@@ -5,6 +5,7 @@ import "./Token.vim" as Tok
 import "./TokenType.vim" as TT
 import "./Expr.vim" as Ex
 import "./Stmt.vim" as St
+import "./Environment.vim" as Env
 
 type Token = Tok.Token
 type TokenType = TT.TokenType
@@ -14,19 +15,15 @@ type Binary = Ex.Binary
 type Grouping = Ex.Grouping
 type Literal = Ex.Literal
 type Unary = Ex.Unary
+type Variable = Ex.Variable
 type Stmt = St.Stmt
 type Print = St.Print
 type Expression = St.Expression
+type Var = St.Var
+type Environment = Env.Environment
 
 export class Interpreter
-    # def Interpret(expr: Expr): void
-        # try
-            # var value = this._Evaluate(expr)
-            # echo this._Stringify(value)
-        # catch
-            # Common.RuntimeError(v:exception)
-        # endtry
-    # enddef
+    const _environment = Environment.new()
 
     def Interpret(stmts: list<Stmt>): void
         try
@@ -48,6 +45,15 @@ export class Interpreter
             var st = <Print>stmt
             var value = this._Evaluate(st.expression)
             echo this._Stringify(value)
+            return
+
+        elseif instanceof(stmt, Var)
+            var st = <Var>stmt
+            var value: any = null   # NOTE: Don't remove the null and any. Otherwise value will be 0.
+            if st.initializer != null
+                value = this._Evaluate(st.initializer)
+            endif
+            this._environment.Define(st.name.lexeme, value)
             return
         endif
     enddef
@@ -125,6 +131,10 @@ export class Interpreter
 
             # Unreachable.
             return null
+
+        elseif instanceof(expr, Variable)
+            var ex = <Variable>expr
+            return this._environment.Get(ex.name)
 
         else
             return "not implemented"

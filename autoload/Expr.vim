@@ -44,6 +44,14 @@ export class Unary extends Expr
     final right: Expr
 endclass
 
+export class Variable extends Expr
+    def new(name: Token)
+        this.name = name
+    enddef
+
+    final name: Token
+endclass
+
 if !exists("g:vimlox_production")
     defc
 endif

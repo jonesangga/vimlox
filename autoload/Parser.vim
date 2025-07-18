@@ -13,9 +13,11 @@ type Binary = Ex.Binary
 type Grouping = Ex.Grouping
 type Literal = Ex.Literal
 type Unary = Ex.Unary
+type Variable = Ex.Variable
 type Stmt = St.Stmt
 type Print = St.Print
 type Expression = St.Expression
+type Var = St.Var
 
 export class Parser
     final _tokens: list<Token>
@@ -28,19 +30,35 @@ export class Parser
     def Parse(): list<Stmt>
         var statements: list<Stmt> = []
         while !this._IsAtEnd()
-            statements->add(this._Stmt())
+            statements->add(this._Declaration())
         endwhile
         return statements
     enddef
 
-    # def Parse(): any
-        # try
-            # return this._Expression()
-        # catch
-            # echo "caught " .. v:exception
-            # return null
-        # endtry
-    # enddef
+    def _Declaration(): Stmt
+        try
+            if this._Match(TokenType.VAR)
+                return this._VarDecl()
+            endif
+            return this._Stmt()
+        catch
+            this._Synchronize()
+            return null_object
+        endtry
+    enddef
+
+    # varDecl -> "var" IDENTIFIER ( "=" expression )? ";"
+    def _VarDecl(): Stmt
+        var name = this._Consume(TokenType.IDENTIFIER, "Expect variable name.")
+
+        var initializer: Expr
+        if this._Match(TokenType.EQUAL)
+            initializer = this._Expression()
+        endif
+
+        this._Consume(TokenType.SEMICOLON, "Expect ';' after variable declaration")
+        return Var.new(name, initializer)
+    enddef
 
     def _Stmt(): Stmt
         if this._Match(TokenType.PRINT)
@@ -131,7 +149,7 @@ export class Parser
     enddef
 
     # primary -> NUMBER | STRING | "true" | "false" | "nil"
-    #          | "(" expression ")"
+    #          | "(" expression ")" | IDENTIFIER
     def _Primary(): Expr
         if this._Match(TokenType.FALSE)
             return Literal.new(false)
@@ -145,6 +163,10 @@ export class Parser
 
         if this._Match(TokenType.NUMBER, TokenType.STRING)
             return Literal.new(this._Previous().literal)
+        endif
+
+        if this._Match(TokenType.IDENTIFIER)
+            return Variable.new(this._Previous())
         endif
 
         if this._Match(TokenType.LEFT_PAREN)
@@ -204,6 +226,32 @@ export class Parser
 
     def _Previous(): Token
         return this._tokens[this._current - 1]
+    enddef
+
+    def _Synchronize()
+        this._Advance()
+
+        while !this._IsAtEnd()
+            if this._Previous().type == TokenType.SEMICOLON
+                return
+            endif
+
+            var types: tuple<...list<TokenType>> = (
+                TokenType.CLASS,
+                TokenType.FUN,
+                TokenType.VAR,
+                TokenType.FOR,
+                TokenType.IF,
+                TokenType.WHILE,
+                TokenType.PRINT,
+                TokenType.RETURN,
+            )
+            var type = this._Peek().type
+            if index(types, type) >= 0
+                return
+            endif
+            this._Advance()
+        endwhile
     enddef
 endclass
 
